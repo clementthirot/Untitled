@@ -1,0 +1,30 @@
+# Activer la réécriture d'URL
+RewriteEngine On
+
+# Rediriger les requêtes HTTP vers HTTPS
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Rediriger les requêtes 404 vers une page d'erreur personnalisée
+ErrorDocument 404 /404.html
+
+# Supprimer .html de l'URL
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}\.html -f
+RewriteRule ^(.*)$ $1.html [L]
+
+# Rediriger les tentatives d'accès à un répertoire (comme css/ ou js/) vers une page d'erreur 403 (Interdit)
+RewriteCond %{REQUEST_URI} ^/(css|js)/ [NC]
+RewriteRule ^ - [F,L]
+
+# Interdire l'accès direct aux répertoires listés
+<DirectoryMatch "^/(css|js)/">
+  Order Allow,Deny
+  Deny from all
+</DirectoryMatch>
+
+# Autoriser l'accès aux fichiers individuels (CSS, JS) dans ces répertoires
+<FilesMatch "\.(css|js)$">
+  Order Allow,Deny
+  Allow from all
+</FilesMatch>
